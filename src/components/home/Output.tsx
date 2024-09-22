@@ -22,7 +22,7 @@ const Output = () => {
       ) : (
 				<div className="partiful-event partiful-event bg-white/[.24] backdrop-blur-sm p-3.5">
 	        <a href={url} className="block max-w-[300px] w-82">
-						<Image src={image}  alt="Event cover image"/>
+						<Image src={image}  alt="Event cover image" width={300} height={300}/>
 						<h3 className="text-base font-bold mt-2.5 mb-1">{title}</h3>
 						<p className="text-sm">{description}</p>
 	        </a>

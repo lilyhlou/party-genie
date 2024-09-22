@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint"
   },
-  "author": "CodeBucks <codebucks27@gmail.com> (https://devdreaming.com)",
+  "author": "Lily Lou <lilylou16@gmail.com> (https://lilylou.xyz)",
   "dependencies": {
     "@ai-sdk/google-vertex": "^0.0.35",
     "@ai-sdk/openai": "^0.0.14",

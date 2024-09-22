@@ -5,7 +5,7 @@ import Output from "@/components/home/Output";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { generateEvent } from "@/app/actions";
+import { generate } from "@/app/actions";
 import { BioContext } from "@/context/BioContext";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -58,7 +58,7 @@ export function UserInput() {
     },
   })
 
-	const { setOutput, setTitle, setDescription, setEffect, setTemplate, setImage, setURL, setLoading, loading } = useContext(BioContext);
+	const { setOutput, setTitle, setDescription, setImage, setURL, setLoading, loading } = useContext(BioContext);
 
   async function onSubmit(values: z.infer<typeof FormSchema>) {
     // Do something with the form values.
@@ -66,14 +66,12 @@ export function UserInput() {
     setLoading(true);
 
     try {
-      const response = await generateEvent(values);
-      setOutput(response.output);
-			setTitle(response.title)
-			setDescription(response.description)
-			setEffect(response.effect)
-			setTemplate(response.template)
-			setImage(response.image)
-			setURL(response.url)
+      const object = await generate(values['tags']);
+      setOutput(JSON.stringify(object));
+			setTitle(object.title)
+			setDescription(object.description)
+			setImage(object.image)
+			setURL(object.url)
       setLoading(false);
     } catch (e) {
       console.log(e);
