@@ -1,0 +1,158 @@
+"use server";
+
+const {VertexAI} = require('@google-cloud/vertexai');
+
+const vertex_ai = new VertexAI({project: 'partiful-app-433800', location: 'us-central1'});
+const model = 'gemini-1.5-pro-001';
+
+// Instantiate the models
+const generativeModel = vertex_ai.preview.getGenerativeModel({
+model: model,
+systemInstruction: {
+	parts: [
+		{text: `You are a quick-witted party planner with a passion for coming up with creative party ideas based on user needs. The parties need to be able to be organized and run by a single person. Users will provide you with keywords like \"Birthday\" \"Chill\" \"Dance\" or \"Cincinnati, Ohio\" and you will need to use these instructions to create a unique and fun party idea for them. For each party idea you will need to provide the following info: 
+-Party Title: A title that is both eye-catching, funny, and relevant to the party
+-Party Description: A 1-3 description of the event for those invited. Make sure to be both descriptive and clever about what makes this party special.
+-Template: Choose a template to appear on the digital invite based on the party\'s theme using any of exact terms on the following list: komorebi, rainbowGlitter, beer, cloudflow, ink, midday, girlyMac, midnight, lofiGrass, aquamarine, blacklight, kaleidoscope, shroomset, galaxy, sunrise, lavaRave, darkSky, crystal, champagne, bokeh, starburst, grass, candy, aquatica, daybreak, twilight, aurora, pool, bubblegum, forest, sunset, winterWonderland
+-Effect: Choose a visual effect to appear on the digital invite based on the the party\'s theme using any of exact terms on the following list: tennis , fireCannons, graduation, sakura, sunbeams, bubbles, starrySky, basketball, beachballs, dandelions, bows, kisses, lightning, cuteGhost, confettiExplosion, smoke, confetti, sparkles, hearts, fireworks, cash, doge, disco, lights, stars, lasers, leaves, spiders, shadowBats, football, thanksgivingFood, winterCreatures, snowman, snowflakes, gingerbread, christmasLights, presents, gelt, shamrock
+-Image: Choose an image to appear on the digital invite based on the the party\'s theme using any of exact terms on the following list: flowers, futuristic, dinner party young, city housewarming, clowning, bumping music, Y2K, movies, back to school, games bitch, classy martinis, hamburger bun, peanut butter jar, pizza party, paint n sip, discoball, dinner party simple, prom, bloody mary, come hang club penguin, billiards, well always have paris, dreaming and dating, suns out buns out, quit your job
+
+Only provide one party idea at a time. 
+If the keyword are \"weird\", \"quirky\", or \"chaos\" do not include those words in the title or description. 
+If a location is provided as a keyword, make sure that the party idea pulls from relevant landmarks.
+
+input: Chaos, Spring, Day
+output: 
+- Party Title: 🧹 spring cleaning
+- Description: everyone come over and clean my apartment! snacks provided, BYOB
+- Template: kaleidoscope
+- Effect: dandelions
+- Image: quit your job
+
+input: Chaos, Flirty, Night
+output: 
+- Party Title: 💋 set me up
+- Description: Everyone bring a friend to set me up with.
+- Template: champagne
+- Effect: kisses  
+- Image: dreaming and dating 
+
+input: Birthday
+output: 
+- Party Title: It\'s a Bday Roast!!!
+- Description: presents are overrated, roast me
+- Template: rainbowGlitter
+- Effect: confetti
+- Image: clowning
+
+input: Outside, Birthday, New York
+output: 
+- Party Title: 🍉 photosynthesize in Domino Park for my bday
+- Description: bring food, drinks, game,s blankets, pets, a turntable, latest craft hyperfixation, anything you want 💖
+- Template: lofiGrass
+- Effect: sakura
+- Image: come hang club penguin
+
+input: Sport, Outside, Summer, La Jolla
+output: 
+- Party Title: Pickleball Social Club
+- Description: let\'s play some pickleball in Kellogg Park
+- Template: grass
+- Effect: lasers
+- Image: suns out buns out
+
+
+input: Fall
+output: 
+- Party Title: photo foliage walk
+- Description: take some photos outside of autumn
+- Template: forest
+- Effect: leaves
+- Image: flowers
+
+input: Dinner, chill
+output: 
+- Party Title: pizza Party 🍕
+- Description: byotopping
+- Template: twilight
+- Effect: doge
+- Image: pizza party
+
+input: Chill, movie, chaotic
+output: 
+- Party Title: Bad movie watch party 
+- Description: Come watch the worst movies of 2024
+- Template: komorebi
+- Effect: lights
+- Image: A24
+`}
+	]
+},
+generationConfig: {
+	'maxOutputTokens': 8192,
+	'temperature': 1,
+	'topP': 0.95,
+},
+safetySettings: [
+	{
+			'category': 'HARM_CATEGORY_HATE_SPEECH',
+			'threshold': 'BLOCK_MEDIUM_AND_ABOVE'
+	},
+	{
+			'category': 'HARM_CATEGORY_DANGEROUS_CONTENT',
+			'threshold': 'BLOCK_MEDIUM_AND_ABOVE'
+	},
+	{
+			'category': 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+			'threshold': 'BLOCK_MEDIUM_AND_ABOVE'
+	},
+	{
+			'category': 'HARM_CATEGORY_HARASSMENT',
+			'threshold': 'BLOCK_MEDIUM_AND_ABOVE'
+	}
+],
+});
+
+
+export async function generateEvent(
+	tags: { tags: string[]; }
+) {
+  "use server";
+	const tagsString = tags['tags'].join(", ");
+  const request = {
+    contents: [
+      {role: 'user', parts: [{text: tagsString}]}
+    ],
+ };
+ const response = await generativeModel.generateContent(request);
+ const fullTextResponse = response.response.candidates[0].content.parts[0].text;
+
+ const titleRegex = /-(\s)*([A-Za-z\s])*Title\s*:(\s?[^-_])+/i;
+ let title = fullTextResponse.match(titleRegex)[0] ?? ''
+ title = title.split(':')[1] ?? 'Zoolympics 🏅'
+ title = title.trim()
+ const descriptionRegex = /-(\s)*([A-Za-z\s])*Description\s*:(\s?[^-_])+/i;
+ let description = fullTextResponse.match(descriptionRegex)[0] ?? ''
+ description = description.split(':')[1] ?? `🎈It's My Birthday, Let's Go to the Zoo!🎈`
+ description = description.trim()
+ const templateRegex = /-(\s)*([A-Za-z\s])*Template\s*:(\s?[^-_])+/i;
+ let template = fullTextResponse.match(templateRegex)[0] ?? '' 
+ template = template.split(':')[1] ?? 'lofiGrass'
+ template = template.trim()
+ const effectRegex = /-(\s)*([A-Za-z\s])*Effect\s*:(\s?[^-_])+/i; 
+ let effect = fullTextResponse.match(effectRegex)[0] ?? ''
+ effect = effect.split(':')[1] ?? 'sunbeams'
+ effect = effect.trim()
+ const imageRegex = /-(\s)*([A-Za-z\s])*Image\s*:(\s?[^-_])+/i;
+ let image : string = fullTextResponse.match(imageRegex)[0] ?? ''
+ image = image.split(':')[1] ?? 'flowers'
+ image = image.trim().replaceAll(' ', '-')
+ const imageMapping: { [name: string]: string } = {
+	'flowers': 'youre-invited-floral', 'futuristic': 'chrome-holo-party', 'dinner-party-young': 'dinner-party-drawing', 'city-housewarming': 'housewarming-bk', 'clowning' : 'clown-party', 'bumping-music': 'karaoke-night-meme', 'y2k': 'Y2K%20Bratz', 'movies': 'A24', 'back-to-school': 'Back%20to%20School%20S', 'games-bitch': 'Game%20night%20bitch', 'classy-martinis': 'martinis-red', 'hamburger-bun': 'spongebob-bunz', 'peanut-butter-jar': 'peanut-free-table', 'pizza-party': 'pizza-party', 'paint-n-sip': 'paint-n-sip', 'discoball': 'Studio%2054',  'dinner-party-simple': 'dinner-party-simple', 'prom': 'Prom%20Night%207', 'bloody-mary': 'bloody-mary-annie', 'come-hang-club-penguin': 'come-hang-club-penguin', 'billiards' : 'pool-party', 'well-always-have-paris': 'Well%20Always%20Have%20Paris', 'dreaming-and-dating': 'Dreaming%20Sluttier', 'suns-out-buns-out': 'suns%20out%20buns%20out', 'quit-your-job': 'Quit%20Job%20Paris%20Nicole'
+};
+const imageURLParam = imageMapping[image] 
+image = '/assets/event-images/' + image + '.jpeg'
+ const url = 'https://partiful.com/create?title=' + encodeURIComponent(title) + '&poster=' + imageURLParam + '&theme=' + template + '&effect=' + effect + '&description=' + encodeURIComponent(description)
+ const responseObj = {'output': fullTextResponse, title, description, template, effect, image, url}
+  return responseObj;
+}
