@@ -1,48 +1,19 @@
 "use client"
 import React, { useContext } from "react";
-import Output from "@/components/home/Output";
-
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { generate } from "@/app/actions";
 import { BioContext } from "@/context/BioContext";
-import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Loader2 } from "lucide-react";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import PartifulLink from "./PartifulLink";
-
-const items = [
-  {
-    id: "birthday",
-    label: "🎂 birthday",
-  },
-  {
-    id: "chill",
-    label: "🍵 chill",
-  },
-  {
-    id: "summer",
-    label: "☀️ summer",
-  },
-  {
-    id: "location",
-    label: "🏙️ my location",
-  },
-  {
-    id: "chaos",
-    label: "🐒 chaos",
-  }
-] as const
 
 const FormSchema = z.object({
   tags: z.array(z.string()).refine((value) => value.some((item) => item), {
@@ -58,16 +29,14 @@ export function UserInput() {
     },
   })
 
-	const { setOutput, setTitle, setDescription, setImage, setURL, setLoading, loading } = useContext(BioContext);
+	const { setTitle, setDescription, setImage, setURL, setItems, items, setLoading, loading } = useContext(BioContext);
 
   async function onSubmit(values: z.infer<typeof FormSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
     setLoading(true);
 
     try {
+			alert(values['tags'])
       const object = await generate(values['tags']);
-      setOutput(JSON.stringify(object));
 			setTitle(object.title)
 			setDescription(object.description)
 			setImage(object.image)
@@ -79,9 +48,26 @@ export function UserInput() {
     }
   }
 
+  function addTag(e: any) {
+		let input = document.querySelector('.add-vibe') as HTMLInputElement
+		let value
+		if (input) {
+			value = input.value  ?? ''
+		}
+		if (value) {
+			setItems([...items, {'id': value, 'label': '🫵 ' + value, 'checked': true}])
+			let formVals = [...form.getValues().tags, value]
+			form.setValue('tags', formVals, {
+				shouldValidate: true
+			})
+		}
+		input.value = '';
+	}
+ 
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="text-center">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="text-center m-auto max-w-4xl" id="partiful-tags">
         <FormField
           control={form.control}
           name="tags"
@@ -96,12 +82,14 @@ export function UserInput() {
                     return (
                       <FormItem
                         key={item.id}
-                        className="inline-flex flex-row items-start space-x-3 space-y-0"
+												id={`${item.id}-checkbox`}
+                        className='inline-flex flex-row items-start space-x-3 space-y-0'
                       >
                         <FormControl className="flex gap-x-2">
                           <Checkbox
-                            checked={field.value?.includes(item.id)}
+                            checked={item.checked}
                             onCheckedChange={(checked: boolean) => {
+															item.checked = !item.checked
                               return checked
                                 ? field.onChange([...field.value, item.id])
                                 : field.onChange(
@@ -118,19 +106,14 @@ export function UserInput() {
                   }}
                 />
               ))}
-              <FormMessage />
+							<div className="relative">
+							<Input key='input' tabIndex={0} className="add-vibe .px-6 cursor-pointer rounded-[100px] border border-transparent text-black transition-colors duration-200 ease-in-out text-center" placeholder="🫵 add vibe..."></Input>
+							<button className="add-vibe-submit" type="button" onClick={(e) => addTag(e)}>➕</button>
+							</div>
+              <FormMessage className="w-full"/>
             </FormItem>
           )}
         />
-				        <Output />
-					<div className="flex flex-wrap justify-center gap-x-2 gap-y-2.5 mb-4">
-          <button className="select-none cursor-pointer rounded-[100px] border border-transparent px-6 text-black transition-colors duration-200 ease-in-out" type="submit" disabled={loading}>
-            {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-            🔮 Ask again
-          </button>
-					<PartifulLink></PartifulLink>
-
-					</div>
       </form>
     </Form>
   )

@@ -6,7 +6,7 @@ import { Skeleton } from "../ui/skeleton";
 import Image from 'next/image'
 
 const Output = () => {
-  const { output, title, description, image, url, loading } = useContext(BioContext);
+  const { title, description, image, url, loading } = useContext(BioContext);
   return (
     <div className="relative flex	flex-col items-center mt-5 mb-3.5 overflow-hidden">
       {loading && (

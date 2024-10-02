@@ -17,10 +17,13 @@ const config = {
         "2xl": "1400px",
       },
     },
+		fontSize: {
+			sm: '0.875rem',
+			base: '1rem', 
+			xl: '1.25rem',
+			'2xl': '3.5rem'
+		},
     extend: {
-      fontFamily: {
-        sans: ['var(--font-geist-sans)'],
-      },
       screens:{
         xs: "380px",
         slg: "840px"
