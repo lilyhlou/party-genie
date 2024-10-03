@@ -29,13 +29,12 @@ export function UserInput() {
     },
   })
 
-	const { setTitle, setDescription, setImage, setURL, setItems, items, setLoading, loading } = useContext(BioContext);
+	const { setTitle, setDescription, setImage, setURL, setItems, items, setLoading } = useContext(BioContext);
 
   async function onSubmit(values: z.infer<typeof FormSchema>) {
     setLoading(true);
 
     try {
-			alert(values['tags'])
       const object = await generate(values['tags']);
 			setTitle(object.title)
 			setDescription(object.description)
@@ -46,6 +45,15 @@ export function UserInput() {
       console.log(e);
       setLoading(false);
     }
+		const i = Math.floor(Math.random() * 8) + 1;
+		const background = "url('/assets/backgrounds/frame-" + i + ".png')";
+    document.body.style.backgroundImage = background
+		if (i > 6) {
+			document.body.classList.add('dark')
+		} else {
+			document.body.classList.remove('dark')
+		}
+		
   }
 
   function addTag(e: any) {
@@ -64,7 +72,6 @@ export function UserInput() {
 		input.value = '';
 	}
  
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="text-center m-auto max-w-4xl" id="partiful-tags">

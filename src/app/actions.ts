@@ -95,6 +95,9 @@ output:
 				effect: z.enum(['tennis', 'fireCannons', 'graduation', 'sakura', 'sunbeams', 'bubbles', 'starrySky', 'basketball', 'beachballs', 'dandelions', 'bows', 'kisses', 'lightning', 'cuteGhost', 'confettiExplosion', 'smoke', 'confetti', 'sparkles', 'hearts', 'fireworks', 'cash', 'doge', 'disco', 'lights', 'stars', 'lasers', 'leaves', 'spiders', 'shadowBats', 'football', 'thanksgivingFood', 'winterCreatures', 'snowman', 'snowflakes', 'gingerbread', 'christmasLights', 'presents', 'gelt', 'shamrock']).describe('Choose a visual effect to appear on the digital invite based on the the party\'s theme'),
 				image: z.enum(['flowers', 'futuristic', 'dinner party young', 'city housewarming', 'clowning', 'bumping music', 'Y2K', 'movies', 'back to school', 'games bitch', 'classy martinis', 'hamburger bun', 'peanut butter jar', 'pizza party', 'paint n sip', 'discoball', 'dinner party simple', 'prom', 'bloody mary', 'come hang club penguin', 'billiards', 'well always have paris', 'dreaming and dating', 'suns out buns out', 'quit your job']).describe('Choose an image to appear on the digital invite based on the the party\'s theme')
       }),
+			frequencyPenalty: 1.75,
+			presencePenalty: 1.5,
+			temperature: 1
     });
 
 		const imageMapping: { [name: string]: string } = {
@@ -113,47 +116,3 @@ output:
  
   return event;
 }
-/*
-export async function generateEvent(
-	tags: { tags: string[]; }
-) {
-  "use server";
-	const tagsString = tags['tags'].join(", ");
-  const request = {
-    contents: [
-      {role: 'user', parts: [{text: tagsString}]}
-    ],
- };
- const response = await generativeModel.generateContent(request);
- const fullTextResponse = response.response.candidates[0].content.parts[0].text;
-
- const titleRegex = /-(\s)*([A-Za-z\s])*Title\s*:(\s?[^-_])+/i;
- let title = fullTextResponse.match(titleRegex)[0] ?? ''
- title = title.split(':')[1] ?? 'Zoolympics 🏅'
- title = title.trim()
- const descriptionRegex = /-(\s)*([A-Za-z\s])*Description\s*:(\s?[^-_])+/i;
- let description = fullTextResponse.match(descriptionRegex)[0] ?? ''
- description = description.split(':')[1] ?? `🎈It's My Birthday, Let's Go to the Zoo!🎈`
- description = description.trim()
- const templateRegex = /-(\s)*([A-Za-z\s])*Template\s*:(\s?[^-_])+/i;
- let template = fullTextResponse.match(templateRegex)[0] ?? '' 
- template = template.split(':')[1] ?? 'lofiGrass'
- template = template.trim()
- const effectRegex = /-(\s)*([A-Za-z\s])*Effect\s*:(\s?[^-_])+/i; 
- let effect = fullTextResponse.match(effectRegex)[0] ?? ''
- effect = effect.split(':')[1] ?? 'sunbeams'
- effect = effect.trim()
- const imageRegex = /-(\s)*([A-Za-z\s])*Image\s*:(\s?[^-_])+/i;
- let image : string = fullTextResponse.match(imageRegex)[0] ?? ''
- image = image.split(':')[1] ?? 'flowers'
- image = image.trim().replaceAll(' ', '-')
- const imageMapping: { [name: string]: string } = {
-	'flowers': 'youre-invited-floral', 'futuristic': 'chrome-holo-party', 'dinner-party-young': 'dinner-party-drawing', 'city-housewarming': 'housewarming-bk', 'clowning' : 'clown-party', 'bumping-music': 'karaoke-night-meme', 'y2k': 'Y2K%20Bratz', 'movies': 'A24', 'back-to-school': 'Back%20to%20School%20S', 'games-bitch': 'Game%20night%20bitch', 'classy-martinis': 'martinis-red', 'hamburger-bun': 'spongebob-bunz', 'peanut-butter-jar': 'peanut-free-table', 'pizza-party': 'pizza-party', 'paint-n-sip': 'paint-n-sip', 'discoball': 'Studio%2054',  'dinner-party-simple': 'dinner-party-simple', 'prom': 'Prom%20Night%207', 'bloody-mary': 'bloody-mary-annie', 'come-hang-club-penguin': 'come-hang-club-penguin', 'billiards' : 'pool-party', 'well-always-have-paris': 'Well%20Always%20Have%20Paris', 'dreaming-and-dating': 'Dreaming%20Sluttier', 'suns-out-buns-out': 'suns%20out%20buns%20out', 'quit-your-job': 'Quit%20Job%20Paris%20Nicole'
-};
-const imageURLParam = imageMapping[image] 
-image = '/assets/event-images/' + image + '.jpeg'
- const url = 'https://partiful.com/create?title=' + encodeURIComponent(title) + '&poster=' + imageURLParam + '&theme=' + template + '&effect=' + effect + '&description=' + encodeURIComponent(description)
- const responseObj = {'output': fullTextResponse, title, description, template, effect, image, url}
-  return responseObj;
-}
-*/

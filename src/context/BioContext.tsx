@@ -9,12 +9,17 @@ interface BioContextTypes {
 	url: string,
 	items: { id: string; label: string; checked: boolean; }[],
   loading: boolean;
+  darkMode: boolean;
+  background: number;
   setTitle: React.Dispatch<React.SetStateAction<string>>;
   setDescription: React.Dispatch<React.SetStateAction<string>>;
   setImage: React.Dispatch<React.SetStateAction<string>>;
   setURL: React.Dispatch<React.SetStateAction<string>>;
   setItems: React.Dispatch<React.SetStateAction<{ id: string; label: string; checked: boolean; }[]>>;
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setDarkMode: React.Dispatch<React.SetStateAction<boolean>>;
+	setBackground: React.Dispatch<React.SetStateAction<number>>;
+
 }
 
 export const BioContext = createContext<BioContextTypes>({
@@ -50,12 +55,16 @@ export const BioContext = createContext<BioContextTypes>({
 		}
 	],
 	loading: false,
+	darkMode: false,
+	background: 3,
   setTitle: () => {},
   setDescription: () => {},
   setImage: () => {},
 	setURL: () => {},
 	setItems: () => {},
   setLoading: () => {},
+	setDarkMode: () => {},
+	setBackground: () => {}
 });
 
 export const BioProvider = ({ children }: { children: React.ReactNode }) => {
@@ -92,8 +101,11 @@ const [items, setItems] = useState([
 	}
 ])
 
+const [background, setBackground] = useState(3)
+const [darkMode, setDarkMode] = useState(false)
+
   return (
-    <BioContext.Provider value={{ title, setTitle, description, setDescription, image, setImage, setURL, url, items, setItems, setLoading, loading }}>
+    <BioContext.Provider value={{ title, setTitle, description, setDescription, image, setImage, setURL, url, items, setItems, setLoading, loading, background, setBackground, darkMode, setDarkMode }}>
       {children}
     </BioContext.Provider>
   );
