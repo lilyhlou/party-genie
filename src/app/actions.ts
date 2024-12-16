@@ -1,15 +1,13 @@
 "use server";
 import { generateObject } from 'ai';
-import { vertex, createVertex } from '@ai-sdk/google-vertex';
 import { openai } from '@ai-sdk/openai';
 
-import { createStreamableValue } from 'ai/rsc';
 import { z } from 'zod';
 
 export async function generate(tags: string[]) {
   'use server';
-	const input = tags.join(", ");
 	
+	const input = tags.join(", ")	
     const { object: schema } = await generateObject({
 			model: openai('gpt-4-turbo'),
       system: `You are a quick-witted party planner with a passion for coming up with creative party ideas based on user needs. The parties need to be able to be organized and run by a single person. Users will provide you with keywords like \"Birthday\" \"Chill\" \"Dance\" or \"Cincinnati, Ohio\" and you will need to use these instructions to create a unique and fun party idea for them. For each party idea you will need to provide the following info: 
@@ -97,7 +95,7 @@ output:
       }),
 			frequencyPenalty: 1.75,
 			presencePenalty: 1.5,
-			temperature: 1
+			temperature: .7
     });
 
 		const imageMapping: { [name: string]: string } = {
